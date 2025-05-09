@@ -25,6 +25,8 @@ def main():
     global shutdown
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
+    username = input("Enter your username: ")
+    s.sendall(username.encode())
     send_message_thread = threading.Thread(target=send_message, args=(s, ))
     recive_message_thread = threading.Thread(target=recive_message, args=(s, ), daemon=True)
     send_message_thread.start()
