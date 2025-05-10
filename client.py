@@ -2,7 +2,7 @@ import socket
 import threading
 import bcrypt
 
-HOST = "127.0.0.1"
+HOST = "message.quackmail.com.au"
 PORT = 28752
 shutdown = False
 
