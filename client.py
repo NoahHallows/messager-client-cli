@@ -2,7 +2,7 @@ import socket
 import threading
 import bcrypt
 
-HOST = "message.quackmail.com.au"
+HOST = "4.147.93.138"
 PORT = 28752
 shutdown = False
 
@@ -23,6 +23,7 @@ def recive_message(s):
         print(f"Recived {data.decode()}")
 
 def login(s):
+    s.sendall("login".encode())
     while True:
         username = input("Enter your username: ")
         if username == ":q":
@@ -49,12 +50,38 @@ def login(s):
             salt = None
             continue
 
+def create_accout(s):
+    s.sendall("newaccount".encode())
+    while True:
+        username = input("Enter your new username: ")
+        s.sendall(username.encode())
+        data = s.recv(1024)
+        if data.strip() == b'0':
+            password = input("Enter your password: ")
+            salt = bcrypt.gensalt()
+            password_hash = bcrypt.hashpw(password.encode(), salt)
+            s.sendall(password_hash)
+            s.sendall(salt)
+            if data.strip() == b'1':
+                print(f"User {username} created")
+            else:
+                print("An error occured")
+                continue
+        else:
+            print("Select a new username")
+            continue
+
+
 
 def main():
     global shutdown
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
-    username, password_hash = login(s)
+    create_account_var = input("Do you want to create an account? (y/n)")
+    if create_account == 'y':
+        create_accout(s)
+    else:    
+        username, password_hash = login(s)
     send_message_thread = threading.Thread(target=send_message, args=(s, ))
     recive_message_thread = threading.Thread(target=recive_message, args=(s, ), daemon=True)
     send_message_thread.start()
