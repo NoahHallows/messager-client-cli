@@ -2,7 +2,8 @@ import socket
 import threading
 import bcrypt
 
-HOST = "4.147.93.138"
+HOST = "127.0.0.1"
+#PORT = 23456
 PORT = 28752
 shutdown = False
 
@@ -50,7 +51,7 @@ def login(s):
             salt = None
             continue
 
-def create_accout(s):
+def create_account(s):
     s.sendall("newaccount".encode())
     while True:
         username = input("Enter your new username: ")
@@ -59,11 +60,13 @@ def create_accout(s):
         if data.strip() == b'0':
             password = input("Enter your password: ")
             salt = bcrypt.gensalt()
-            password_hash = bcrypt.hashpw(password.encode(), salt)
+            password_hash = bcrypt.hashpw(password.encode(), salt.encode())
             s.sendall(password_hash)
             s.sendall(salt)
+            data = s.recv(1024)
             if data.strip() == b'1':
                 print(f"User {username} created")
+                return username, password_hash
             else:
                 print("An error occured")
                 continue
@@ -78,8 +81,8 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     create_account_var = input("Do you want to create an account? (y/n)")
-    if create_account == 'y':
-        create_accout(s)
+    if create_account_var.lower() == 'y':
+        username, password_hash = create_account(s)
     else:    
         username, password_hash = login(s)
     send_message_thread = threading.Thread(target=send_message, args=(s, ))
