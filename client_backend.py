@@ -1,6 +1,7 @@
 import socket
 import threading
 import bcrypt
+from time import sleep
 
 class ChatClient:
     def __init__(self, host="127.0.0.1", port=28752):
@@ -67,6 +68,7 @@ class ChatClient:
         # Login function
         try:
             self.socket.sendall("login".encode())
+            sleep(0.5)
             # Send username
             self.socket.sendall(username.encode())
             # Get salt
@@ -99,6 +101,7 @@ class ChatClient:
         # Create new account
         try:
             self.socket.sendall("newaccount".encode())
+            sleep(0.5)
             # Send username
             self.socket.sendall(username.encode())
             # Check if username is avalible

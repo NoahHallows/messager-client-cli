@@ -26,7 +26,7 @@ class ChatClientCLI:
 
             if message.lower() == ":q":
                 print("Exiting...")
-                self.client.disconnet()
+                self.client.disconnect()
                 break
             if not self.client.send_message(message):
                 print("Failed to send message, connection may be lost")
