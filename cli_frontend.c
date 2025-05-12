@@ -1,5 +1,34 @@
 #include <Python.h>
 #include <stdio.h>
+#include <gtk/gtk.h>
+
+static void login_btn_func(GtkButton *login_btn) {
+  const char *s;
+
+  s = gtk_button_get_label(login_btn);
+  if (g_strcmp0(s, "Login") == 0) {
+    gtk_button_set_label(login_btn, "Loged in!!!");
+  } else {
+    gtk_button_set_label(login_btn, "Login");
+  }
+}
+
+
+
+static void
+app_activate (GApplication *app) {
+  GtkWidget *win;
+  GtkWidget *box;
+  GtkWidget *btn1;
+  GtkWidget *lab;
+  win = gtk_application_window_new(GTK_APPLICATION(app));
+  gtk_window_set_title(GTK_WINDOW(win), "Quackmessage");
+  gtk_window_set_default_size(GTK_WINDOW(win), 400, 300);
+  
+  box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+  gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
+  gtk_window_set_child(GTK_WINDOW(win), box);
+
 
 int main() {
     Py_Initialize();
