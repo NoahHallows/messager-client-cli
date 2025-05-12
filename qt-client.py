@@ -1,20 +1,26 @@
 from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QLineEdit, QVBoxLayout, QPushButton, QLabel, QGridLayout, QListWidget, QMessageBox, QFormLayout, QFrame, QScrollArea, QWidget, QHBoxLayout, QStackedWidget
-from PySide6.QtCore import Slot, Qt
+from PySide6.QtCore import Slot, Qt, Signal
 import sys
 from client_backend import ChatClient
 import threading
 
 class MessageBubble(QFrame):
-    def __init__(self, text, is_sender=False):
+    def __init__(self, text, sender, is_sender=False):
         super().__init__()
+        print(f"Sender: {sender}, message: {text}")
+        # fixed-height policy so bubbles don't expand vertically
+#        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setStyleSheet(
             "background-color: {}; border-radius: 10px; padding: 5px;".format(
-                "#DCF8C6" if is_sender else "#E5E5EA"
+                "#4CAF50" if is_sender else "#2196F3"
             )
         )
         layout = QHBoxLayout()
         label = QLabel(text)
         label.setWordWrap(True)
+        sender_label = QLabel(sender)
+        sender_label.setWordWrap(True)
+        layout.addWidget(sender_label)
         layout.addWidget(label)
         layout.setAlignment(Qt.AlignRight if is_sender else Qt.AlignLeft)
         self.setLayout(layout)
@@ -24,7 +30,7 @@ class Login_window(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Quackmessage - Login")
-        self.resize(300, 200)
+        self.resize(450, 500)
         login_grid = QFormLayout()
         # Declare widgets
         self.username_input = QLineEdit()
@@ -63,6 +69,9 @@ class Login_window(QWidget):
 
 class Main_Window(QWidget):
 
+    # define a signal that carries the new message text
+    message_received = Signal(str, str)
+
     def __init__(self, username, password, create_account_var, parent=None):
         print("Main window called")
         super().__init__(parent=parent)
@@ -70,8 +79,10 @@ class Main_Window(QWidget):
         self.password = password
 
         self.setWindowTitle("Quackmessage")
-        self.resize(350, 400)
+        self.resize(450, 500)
 
+        # connect signal to a slot that actually updates the UI
+        self.message_received.connect(self._append_message)
 
         # Initalize messager backend
         self.client = ChatClient()
@@ -111,20 +122,19 @@ class Main_Window(QWidget):
         self.main_layout.addLayout(self.input_layout)
         self.setLayout(self.main_layout)
 
-
-        # Set up message handling
-        self.client.set_message_callback(self.message_handler)
+        # set up backend callback to emit the signal
+        self.client.set_message_callback(lambda msg, sender: self.message_received.emit(msg, sender))
         self.client.start_receiving()
 
         if not self.authenticated:
             self.showMsgBox("Authentication cancelled. Exiting")
-            self.client.disconnect()
-            return
+            self.exit_app()
 
        
     def exit_app(self):
         self.close()
         self.client.disconnect()
+        exit()
 
     def showMsgBox(self, text):
         msgBox = QMessageBox()
@@ -163,10 +173,11 @@ class Main_Window(QWidget):
             self.showMsgBox(f"Error logging in: {e}")
             
 
-    
-    def message_handler(self, message):
+    @Slot(str, str)
+    def _append_message(self, message, sender):
+        print(f"Sender: {sender}, message: {message}")
         if message:
-            bubble = MessageBubble(message, is_sender=False)
+            bubble = MessageBubble(message, sender, is_sender=False)
             self.messages_layout.addWidget(bubble)
             self.scroll_area.verticalScrollBar().setValue(self.scroll_area.verticalScrollBar().maximum())
 
@@ -176,7 +187,7 @@ class Main_Window(QWidget):
         if not self.client.send_message(text):
             self.showMsgBox("Error sending message")            
         if text:
-            bubble = MessageBubble(text, is_sender=True)
+            bubble = MessageBubble(text, self.username, is_sender=True)
             self.messages_layout.addWidget(bubble)
             self.input.clear()
             # Scroll to bottom
