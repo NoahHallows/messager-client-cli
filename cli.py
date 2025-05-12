@@ -80,7 +80,7 @@ class ChatClientCLI:
 
         if not authenticated:
             print("Authentication cancelled. Exiting.")
-            self.client.disconnet()
+            self.client.disconnect()
             return
 
         # Set up message handling

@@ -73,14 +73,14 @@ class ChatClient:
             self.socket.sendall(username.encode())
             # Get salt
             data = self.socket.recv(1024)
-            response = data.decode().strip()
+            response = data.strip()
 
             if response == "False":
                 return False, "Incorrect username or password"
 
             # Hash password
             salt = response
-            password_hash = bcrypt.hashpw(password.encode(), salt.encode())
+            password_hash = bcrypt.hashpw(password.encode(), salt)
 
             # Send hashed password
             self.socket.sendall(password_hash)
@@ -104,7 +104,7 @@ class ChatClient:
             sleep(0.5)
             # Send username
             self.socket.sendall(username.encode())
-            # Check if username is avalible
+            # Check if username is avalible`
             data = self.socket.recv(1024)
             if data.strip() != b'0':
                 return False, "Username already taken"
