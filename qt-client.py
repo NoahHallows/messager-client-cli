@@ -7,7 +7,6 @@ import threading
 class MessageBubble(QFrame):
     def __init__(self, text, sender, is_sender=False):
         super().__init__()
-        print(f"Sender: {sender}, message: {text}")
         # fixed-height policy so bubbles don't expand vertically
 #        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setStyleSheet(
@@ -73,7 +72,6 @@ class Main_Window(QWidget):
     message_received = Signal(str, str)
 
     def __init__(self, username, password, create_account_var, parent=None):
-        print("Main window called")
         super().__init__(parent=parent)
         self.username = username
         self.password = password
@@ -143,15 +141,10 @@ class Main_Window(QWidget):
     
     def login(self, username, password):
         try:
-            print(f"Username = {username}, password = {password}")
             success, message = self.client.login(username, password)
-            print(f"{message}")
-            #self.setLayout(self.main_layout)
             if success:
-                print("Success logging in!!")
                 return True
             else:
-                print("Unsuccessful logging in :(")
                 if self.parent() and hasattr(self.parent(), 'login_screen'):
                     self.parent().login_screen()
 
@@ -161,12 +154,9 @@ class Main_Window(QWidget):
     def create_account(self, username, password):
         try:
             success, message = self.client.create_account(username, password)
-            print(f"{message}")
             if success:
-                print("Successfully created account")
                 return True
             else:
-                print("Unsuccessfully created account")
                 if self.parent() and hasattr(self.parent(), 'login_screen'):
                     self.parent.login_screen()
         except Exception as e:
@@ -175,7 +165,6 @@ class Main_Window(QWidget):
 
     @Slot(str, str)
     def _append_message(self, message, sender):
-        print(f"Sender: {sender}, message: {message}")
         if message:
             bubble = MessageBubble(message, sender, is_sender=False)
             self.messages_layout.addWidget(bubble)

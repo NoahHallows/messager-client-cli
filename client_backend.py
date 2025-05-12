@@ -41,46 +41,34 @@ class ChatClient:
         self.recive_thread.start()
     
     def _recv_all(self, n):
-        print("Here")
         buf = b""
         while len(buf) < n:
-            print(f"buf = {buf} and len(buf) = {len(buf)}")
             chunk = self.socket.recv(n - len(buf))
-            print(f"chunk = {chunk}")
             if not chunk:
                 raise ConnectionError("Server disconnected")
             buf += chunk
         return buf
 
     def _receive_message(self):
-        print("Started reciving messages")
         # Background process to recive messages
         while not self.shutdown:
             try:
-                print("reading from socket")
                 # 1) read exactly 4 bytes for the length header
                 raw_len = self._recv_all(4)
-                print("1")
                 msg_len = struct.unpack("!I", raw_len)[0]
-                print("2")
                 # 2) now read exactly msg_len bytes of JSON
                 data = self._recv_all(msg_len)
-                print("reading json from socket")
                 # 2) read the JSON payload
 
-                print("parsing json")
                 # 3) parse JSON
                 payload = json.loads(data.decode("utf-8"))
                 sender  = payload["sender"]
                 message = payload["message"]
-                print(f"[backend] about to call callback with sender={sender!r}, message={message!r}")
                 if self.message_callback:
                     self.message_callback(message, sender)
                 else:
-                    print(f"Sender: {sender} Recived: {message} and callback doesn't work")
             except Exception as e:
                 if not self.shutdown:
-                    print(f"Error reciving message: {e}")
                 break
 
     def send_message(self, message):
@@ -90,17 +78,14 @@ class ChatClient:
                 "sender":   self.username,
                 "message":  message
             }
-            print(f"Message payload: {payload}")
             # 2) convert to UTF-8 JSON bytes
             data = json.dumps(payload).encode("utf-8")
             # 3) prefix with 4-byte big-endian length
             header = struct.pack("!I", len(data))
-            print(f"Header: {header}, data: {data}")
             # 4) send header + body
             self.socket.sendall(header + data)
             return True
         except Exception as e:
-            print(f"Error sending message: {e}")
             return False
 
     def login(self, username, password):
