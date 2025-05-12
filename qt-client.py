@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QLineEdit, QVBoxLayout, QPushButton, QLabel, QGridLayout, QListWidget, QMessageBox, QFormLayout, QFrame, QScrollArea, QWidget, QHBoxLayout
 from PySide6.QtCore import Slot, Qt
 import sys
+from client_backend import ChatClient
+import threading
 
 class MessageBubble(QFrame):
     def __init__(self, text, is_sender=False):
@@ -25,8 +27,8 @@ class Login_window(QDialog):
         self.resize(300, 200)
         login_grid = QFormLayout()
         # Declare widgets
-        username_input = QLineEdit()
-        passwd_input = QLineEdit()
+        self.username_input = QLineEdit()
+        self.passwd_input = QLineEdit()
         login_btn = QPushButton("Login")
         login_btn.clicked.connect(self.login_btn_func)
         
@@ -35,8 +37,8 @@ class Login_window(QDialog):
         login_grid.addRow(QLabel("Welcome to Quackmessage"))
 
         # Add these to layout
-        login_grid.addRow(self.tr("Username:"), username_input)
-        login_grid.addRow(self.tr("Password:"), passwd_input)
+        login_grid.addRow(self.tr("Username:"), self.username_input)
+        login_grid.addRow(self.tr("Password:"), self.passwd_input)
         login_grid.addRow(login_btn, create_account_btn)
         
         # Set this new layout to be used
@@ -44,8 +46,10 @@ class Login_window(QDialog):
 
     @Slot()
     def login_btn_func(self):
+        username = self.username_input.text()
+        passwd = self.passwd_input.text()
         self.close()
-        print("Logged in")
+        Main_Window.login(username, passwd)
 
 class Main_Window(QWidget):
 
@@ -53,7 +57,17 @@ class Main_Window(QWidget):
         super().__init__(parent=None)
         self.setWindowTitle("Quackmessage")
         self.resize(350, 400)
-
+       
+        self.authenticated = False
+        # Initalize messager backend
+        self.client = ChatClient()
+        self.input_lock = threading.Lock()
+        
+        if not self.client.connect():
+            msgBox = QMessageBox()
+            msgBox.setText("Connection to server failed")
+            msgBox.exec()
+            self.exit_app()
         
         self.main_layout = QVBoxLayout()
         # Scroll area for messages
@@ -80,9 +94,21 @@ class Main_Window(QWidget):
         self.main_layout.addLayout(self.input_layout)
         self.setLayout(self.main_layout)
 
+        if not self.authenticated:
+            msgBox = QMessageBox()
+            msgBox.setText("Authentication cancelled. Exiting")
+            self.client.disconnect()
+            return
+
        
+    def exit_app(self):
+        self.close()
+        self.client.disconnect()
 
-
+    def login(username, passwd):
+        print(f"Username = {username}, password = {passwd}")
+        success, message = Main_Window.client.login(username, password)
+        Main_Window.authenticated = True
 
 
     def send_message(self):
