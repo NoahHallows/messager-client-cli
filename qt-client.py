@@ -95,7 +95,9 @@ class Main_Window(QWidget):
 
         # Initalize messager backend
         self.client = ChatClient()
-        self.input_lock = threading.Lock()
+        if not self.client.version_check():
+            self.showMsgBox("Update client")
+            self.exit_app
         
         if not self.client.connect():
             self.showMsgBox("Error connecting to server")

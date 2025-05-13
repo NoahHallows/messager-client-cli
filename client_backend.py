@@ -5,9 +5,8 @@ from time import sleep
 import json
 import struct
 
-#HOST="127.0.0.1"
+VERSION = 1.0
 HOST="messager.quackmail.com.au"
-#HOST="messager.anb0gjf8bhg3h3a5.australiaeast.azurecontainer.io"
 PORT = 28752
 
 class ChatClient:
@@ -35,6 +34,14 @@ class ChatClient:
         if self.socket:
             self.socket.close()
         self.shutdown = True
+
+    def version_check(self):
+        server_version = self.socket.recv(1024).decode()
+        if server_version == VERSION:
+            return True
+        else:
+            return False1
+
 
     def set_message_callback(self, callback):
         # Set callback function for receiving messages
