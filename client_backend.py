@@ -5,8 +5,12 @@ from time import sleep
 import json
 import struct
 
+HOST="127.0.0.1"
+#HOST="20.167.75.79"
+PORT = 28752
+
 class ChatClient:
-    def __init__(self, host="127.0.0.1", port=28752):
+    def __init__(self, host=HOST, port=PORT):
         self.host = host
         self.port = port
         self.socket = None
@@ -67,9 +71,11 @@ class ChatClient:
                 if self.message_callback:
                     self.message_callback(message, sender)
                 else:
+                    print(f"{sender}: {message} CALLBACK IS NOT WORKING!!!!")
             except Exception as e:
+                print(f"Reveive message error: {e}")
                 if not self.shutdown:
-                break
+                    break
 
     def send_message(self, message):
         try:
@@ -150,4 +156,4 @@ class ChatClient:
                 return False, "Error creating account"
 
         except Exception as e:
-            return False, "Account creation error: {e}"
+            return False, f"Account creation error: {e}"

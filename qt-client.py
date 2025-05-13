@@ -1,14 +1,23 @@
-from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QLineEdit, QVBoxLayout, QPushButton, QLabel, QGridLayout, QListWidget, QMessageBox, QFormLayout, QFrame, QScrollArea, QWidget, QHBoxLayout, QStackedWidget
+from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QLineEdit, QVBoxLayout, QPushButton, QLabel, QGridLayout, QListWidget, QMessageBox, QFormLayout, QFrame, QScrollArea, QWidget, QHBoxLayout, QStackedWidget, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Slot, Qt, Signal
 import sys
 from client_backend import ChatClient
 import threading
 
 class MessageBubble(QFrame):
+    DEFAULT_HEIGHT = 40
     def __init__(self, text, sender, is_sender=False):
+        
         super().__init__()
+        # 1) Minimum height for single-line bubbles
+        self.setMinimumHeight(self.DEFAULT_HEIGHT)
+        # 2) No hard cap on maximum height
+        self.setMaximumHeight(16777215)  # Qt’s “infinite” default
+        
+        # 3) SizePolicy: expand horizontally, but only use as much vertical as needed
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         # fixed-height policy so bubbles don't expand vertically
-#        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        #self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setStyleSheet(
             "background-color: {}; border-radius: 10px; padding: 5px;".format(
                 "#4CAF50" if is_sender else "#2196F3"
@@ -19,9 +28,12 @@ class MessageBubble(QFrame):
         label.setWordWrap(True)
         sender_label = QLabel(sender)
         sender_label.setWordWrap(True)
+
         layout.addWidget(sender_label)
         layout.addWidget(label)
+        label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         layout.setAlignment(Qt.AlignRight if is_sender else Qt.AlignLeft)
+        layout.setContentsMargins(8, 4, 8, 4)
         self.setLayout(layout)
 
 class Login_window(QWidget):
@@ -166,10 +178,14 @@ class Main_Window(QWidget):
     @Slot(str, str)
     def _append_message(self, message, sender):
         if message:
-            bubble = MessageBubble(message, sender, is_sender=False)
+            if sender == self.username:
+                is_sender = True
+            else:
+                is_sender = False
+            bubble = MessageBubble(message, sender, is_sender)
             self.messages_layout.addWidget(bubble)
             self.scroll_area.verticalScrollBar().setValue(self.scroll_area.verticalScrollBar().maximum())
-
+    @Slot()
     def send_message(self):
         text = self.input.text()
         # Send message
