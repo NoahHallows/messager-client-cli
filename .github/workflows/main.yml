@@ -44,7 +44,7 @@ jobs:
           enable-plugins: pyside6
 
           output-file: quackmessage
-          include-qt-plugins: true
+          
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
