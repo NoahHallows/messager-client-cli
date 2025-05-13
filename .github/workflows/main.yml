@@ -41,15 +41,19 @@ jobs:
           # Build mode: 'app', 'standalone', or leave unset for default
           mode: standalone
 
+          enable-plugins: pyside6
+
+          output-file: quackmessage
+
           # Example built-in flags:
           #onefile: true          # bundle into a single executable
           #remove-output: true    # clean previous build folders before building
 
           # Pass ANY other CLI flags here (one per line):
-          arguments: |
-            --enable-plugin=pyside6
-            --product-name=Quackmessage
-            --output-filename=quackmessage
+          #arguments: |
+          #  --enable-plugin=pyside6
+          #  --product-name=Quackmessage
+          #  --output-filename=quackmessage
           #  --lto                # enable link-time optimization
           #  --python-flag=-O3    # run under optimized bytecode
           #  --enable-plugin=tk-inter  # if you use tkinter GUI
