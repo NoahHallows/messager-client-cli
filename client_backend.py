@@ -37,13 +37,13 @@ class ChatClient:
         self.shutdown = True
 
     def set_message_callback(self, callback):
-        # Set callback function for reciving messages
+        # Set callback function for receiving messages
         self.message_callback = callback
 
     def start_receiving(self):
-        # Start the message reciving threading
-        self.recive_thread = threading.Thread(target=self._receive_message, daemon=True)
-        self.recive_thread.start()
+        # Start the message receiving threading
+        self.receive_thread = threading.Thread(target=self._receive_message, daemon=True)
+        self.receive_thread.start()
     
     def _recv_all(self, n):
         buf = b""
@@ -55,7 +55,7 @@ class ChatClient:
         return buf
 
     def _receive_message(self):
-        # Background process to recive messages
+        # Background process to receive messages
         while not self.shutdown:
             try:
                 # 1) read exactly 4 bytes for the length header
