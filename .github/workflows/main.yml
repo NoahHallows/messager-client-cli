@@ -42,11 +42,14 @@ jobs:
           mode: standalone
 
           # Example built-in flags:
-          #onefile: true          # bundle into a single executable
-          #remove-output: true    # clean previous build folders before building
+          onefile: true          # bundle into a single executable
+          remove-output: true    # clean previous build folders before building
 
           # Pass ANY other CLI flags here (one per line):
-          #arguments: |
+          arguments: |
+            --enable-plugin=pyside6
+            --product-name=Quackmessage
+            --output-filename=quackmessage
           #  --lto                # enable link-time optimization
           #  --python-flag=-O3    # run under optimized bytecode
           #  --enable-plugin=tk-inter  # if you use tkinter GUI
