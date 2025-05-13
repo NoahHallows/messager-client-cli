@@ -43,7 +43,7 @@ jobs:
 
           enable-plugins: pyside6
 
-          output-file: quackmessage
+          #output-file: quackmessage
 
           # Example built-in flags:
           #onefile: true          # bundle into a single executable
