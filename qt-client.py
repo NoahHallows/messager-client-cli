@@ -16,8 +16,6 @@ class MessageBubble(QFrame):
         
         # 3) SizePolicy: expand horizontally, but only use as much vertical as needed
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # fixed-height policy so bubbles don't expand vertically
-        #self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setStyleSheet(
             "background-color: {}; border-radius: 10px; padding: 5px;".format(
                 "#4CAF50" if is_sender else "#2196F3"
@@ -46,6 +44,7 @@ class Login_window(QWidget):
         # Declare widgets
         self.username_input = QLineEdit()
         self.password_input = QLineEdit()
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         login_btn = QPushButton("Login")
         login_btn.clicked.connect(self.login_btn_func)
         
@@ -57,7 +56,7 @@ class Login_window(QWidget):
         # Add these to layout
         login_grid.addRow(self.tr("Username:"), self.username_input)
         login_grid.addRow(self.tr("Password:"), self.password_input)
-        login_grid.addRow(login_btn, create_account_btn)
+        login_grid.addRow(create_account_btn, login_btn)
         
         # Set this new layout to be used
         self.setLayout(login_grid)
@@ -136,9 +135,9 @@ class Main_Window(QWidget):
         self.client.set_message_callback(lambda msg, sender: self.message_received.emit(msg, sender))
         self.client.start_receiving()
 
-        if not self.authenticated:
-            self.showMsgBox("Authentication cancelled. Exiting")
-            self.exit_app()
+        #if not self.authenticated:
+        #    self.showMsgBox("Authentication cancelled. Exiting")
+        #    self.exit_app()
 
        
     def exit_app(self):
@@ -157,8 +156,10 @@ class Main_Window(QWidget):
             if success:
                 return True
             else:
-                if self.parent() and hasattr(self.parent(), 'login_screen'):
-                    self.parent().login_screen()
+                self.showMsgBox("Incorrect username or password")
+                self.exit_app()
+#                if self.parent() and hasattr(self.parent(), 'login_screen'):
+#                    self.parent().login_screen()
 
         except Exception as e:
             self.showMsgBox(f"Error logging in: {e}")
@@ -169,8 +170,10 @@ class Main_Window(QWidget):
             if success:
                 return True
             else:
-                if self.parent() and hasattr(self.parent(), 'login_screen'):
-                    self.parent.login_screen()
+                self.showMsgBox(message)
+                self.exit_app()
+#                if self.parent() and hasattr(self.parent(), 'login_screen'):
+#                    self.parent.login_screen()
         except Exception as e:
             self.showMsgBox(f"Error logging in: {e}")
             
@@ -209,13 +212,19 @@ class meta_window(QStackedWidget):
         self.login_widget = Login_window(parent=self)
         self.addWidget(self.login_widget)
         self.setWindowTitle("Quackmessage - Login")
-        
+        self.resize(500, 500) 
         self.Main_Window = None
 
         # Show login first
         self.setCurrentWidget(self.login_widget)
 
-    def login_screen(self):        
+    def login_screen(self):
+        print("in correct function")
+        if self.login_widget:
+            self.removeWidget(self.login_widget)
+            self.login_widget.deleteLater()
+        self.login_widget = Login_window(parent=self)
+        self.addWidget(self.login_widget)
         self.setWindowTitle("Quackmessage - Login")
         self.setCurrentWidget(self.login_widget)
 
