@@ -6,8 +6,8 @@ import json
 import struct
 
 VERSION = "1.0"
-HOST="127.0.0.1"
-#HOST="messager.quackmail.com.au"
+#HOST="127.0.0.1"
+HOST="messager.quackmail.com.au"
 PORT = 28752
 
 class ChatClient:
