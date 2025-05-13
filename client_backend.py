@@ -5,8 +5,9 @@ from time import sleep
 import json
 import struct
 
-HOST="127.0.0.1"
-#HOST="20.167.75.79"
+#HOST="127.0.0.1"
+HOST="messager.quackmail.com.au"
+#HOST="messager.anb0gjf8bhg3h3a5.australiaeast.azurecontainer.io"
 PORT = 28752
 
 class ChatClient:
