@@ -5,8 +5,9 @@ from time import sleep
 import json
 import struct
 
-VERSION = 1.0
-HOST="messager.quackmail.com.au"
+VERSION = "1.0"
+HOST="127.0.0.1"
+#HOST="messager.quackmail.com.au"
 PORT = 28752
 
 class ChatClient:
@@ -40,7 +41,7 @@ class ChatClient:
         if server_version == VERSION:
             return True
         else:
-            return False1
+            return False
 
 
     def set_message_callback(self, callback):
