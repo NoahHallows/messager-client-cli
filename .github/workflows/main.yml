@@ -46,10 +46,10 @@ jobs:
           #remove-output: true    # clean previous build folders before building
 
           # Pass ANY other CLI flags here (one per line):
-          arguments: |
-            --lto                # enable link-time optimization
-            --python-flag=-O3    # run under optimized bytecode
-            --enable-plugin=tk-inter  # if you use tkinter GUI
+          #arguments: |
+          #  --lto                # enable link-time optimization
+          #  --python-flag=-O3    # run under optimized bytecode
+          #  --enable-plugin=tk-inter  # if you use tkinter GUI
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
