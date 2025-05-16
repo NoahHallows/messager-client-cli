@@ -104,15 +104,15 @@ class Main_Window(QWidget):
             self.showMsgBox("Update client")
             self.exit_app
 
-        
-        self.main_layout = QVBoxLayout()
+        self.main_layout = QHBoxLayout()
+        self.message_layout = QVBoxLayout()
         # Scroll area for messages
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.messages_widget = QWidget()
         self.messages_layout = QVBoxLayout(self.messages_widget)
         self.scroll_area.setWidget(self.messages_widget)
-        self.main_layout.addWidget(self.scroll_area)
+        self.message_layout.addWidget(self.scroll_area)
 
         if create_account_var == False:
             self.authenticated = self.login(username, password)
@@ -132,7 +132,7 @@ class Main_Window(QWidget):
         self.send_button.clicked.connect(self.send_message)
         self.input_layout.addWidget(self.input)
         self.input_layout.addWidget(self.send_button)
-        self.main_layout.addLayout(self.input_layout)
+        self.message_layout.addLayout(self.input_layout)
         self.setLayout(self.main_layout)
 
         # set up backend callback to emit the signal
@@ -196,7 +196,7 @@ class Main_Window(QWidget):
     def send_message(self):
         text = self.input.text()
         # Send message
-        if not self.client.send_message(text):
+        if not self.client.send_message(text, "noah"):
             self.showMsgBox("Error sending message")            
         if text:
             bubble = MessageBubble(text, self.username, is_sender=True)

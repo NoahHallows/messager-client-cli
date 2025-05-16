@@ -5,9 +5,9 @@ from time import sleep
 import json
 import struct
 
-VERSION = "1.0"
-#HOST="127.0.0.1"
-HOST="messager.quackmail.com.au"
+VERSION = "1.1"
+HOST="127.0.0.1"
+#HOST="messager.quackmail.com.au"
 PORT = 28752
 
 class ChatClient:
@@ -86,11 +86,12 @@ class ChatClient:
                 if not self.shutdown:
                     break
 
-    def send_message(self, message):
+    def send_message(self, message, receiver):
         try:
             # 1) build a dict
             payload = {
                 "sender":   self.username,
+                "receiver": receiver,
                 "message":  message
             }
             # 2) convert to UTF-8 JSON bytes
@@ -101,6 +102,7 @@ class ChatClient:
             self.socket.sendall(header + data)
             return True
         except Exception as e:
+            print(f"Error sending message: {e}")
             return False
 
     def login(self, username, password):
